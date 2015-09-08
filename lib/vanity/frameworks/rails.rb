@@ -211,8 +211,16 @@ module Vanity
 
       # Generate url with the identity of the current user and the metric to track on click
       def vanity_track_url_for(identity, metric, options = {})
-        options = options.merge(:_identity => identity, :_track => metric)
-        url_for(options)
+        if options.kind_of?(String)
+          url = Addressable::URI.parse(options)
+          url.query_values = (url.query_values || {}).merge({
+            :_identity => identity, :_track => metric
+          })
+          url.to_s
+        else
+          options = options.merge(:_identity => identity, :_track => metric)
+          url_for(options)
+        end
       end
 
       # Generate url with the fingerprint for the current Vanity experiment
